@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package api.v1;
+
+option go_package = "./ezproxygRPC";
+
+import "google/protobuf/timestamp.proto";
+
+message Entry{
+    int32 id = 1;
+    google.protobuf.Timestamp time = 2;
+    string prefix = 3;
+    string suffix = 4;
+    string title = 5;
+    string url = 6;
+    string config = 7;
+    string operator = 8;
+}
+
+service Entry_Action{
+    rpc Insert(Entry) returns (InsertResponse) {}
+    rpc Modify(Entry) returns (ModifyResponse) {}
+    rpc Retrieve(RetrieveRequest) returns (Entry) {}
+    rpc List(ListRequest) returns (Entries) {}
+}
+
+message ModifyResponse {
+    int32 id = 1;
+}
+
+message RetrieveRequest {
+    int32 id = 1;
+}
+
+message InsertResponse {
+    int32 id = 1;
+}
+
+message ListRequest {
+    int32 offset = 1;
+}
+
+message Entries{
+    repeated Entry entries = 1;
+}
+
+message EntryQuery {
+	int32 offset = 1;
+}
+
