@@ -5,22 +5,22 @@ import (
 	"log"
 	"time"
 
-	api "github.com/jasonzou/ezproxygRPC/src/api/v1"
+	api "github.com/jasonzou/ezgRPC/src/api/v1"
 
 	"google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 )
 
-// var _ api1.Activity = (*grpcServer)(nil)
+// var _ api1.Entry = (*grpcServer)(nil)
 
 type grpcServer struct {
-	api.UnimplementedActivity_LogServer
-	Activities *Activities
+	api.UnimplementedEntry
+	Entries *Entries
 }
 
-func (s *grpcServer) Retrieve(ctx context.Context, req *api.RetrieveRequest) (*api.Activity, error) {
-	resp, err := s.Activities.Retrieve(int(req.Id))
+func (s *grpcServer) Retrieve(ctx context.Context, req *api.RetrieveRequest) (*api.Entry, error) {
+	resp, err := s.Entries.Retrieve(int(req.Id))
 	if err == ErrIDNotFound {
 		return nil, status.Error(codes.NotFound, "id was not found")
 	}
@@ -30,8 +30,8 @@ func (s *grpcServer) Retrieve(ctx context.Context, req *api.RetrieveRequest) (*a
 	return resp, nil
 }
 
-func (s *grpcServer) Insert(ctx context.Context, activity *api.Activity) (*api.InsertResponse, error) {
-	id, err := s.Activities.Insert(activity)
+func (s *grpcServer) Insert(ctx context.Context, entry *api.Entry) (*api.InsertResponse, error) {
+	id, err := s.Entries.Insert(entry)
 	if err != nil {
 		log.Printf("Error:%s", err.Error())
 		return nil, status.Error(codes.Internal, err.Error())
@@ -40,29 +40,29 @@ func (s *grpcServer) Insert(ctx context.Context, activity *api.Activity) (*api.I
 	return &res, nil
 }
 
-func (s *grpcServer) List(ctx context.Context, req *api.ListRequest) (*api.Activities, error) {
-	activities, err := s.Activities.List(int(req.Offset))
+func (s *grpcServer) List(ctx context.Context, req *api.ListRequest) (*api.Entries, error) {
+	entires, err := s.Entries.List(int(req.Offset))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &api.Activities{Activities: activities}, nil
+	return &api.Entries{Entries: entires}, nil
 }
 
 func NewGRPCServer() *grpc.Server {
-	var acc *Activities
+	var acc *Entries
 	var err error
-	if acc, err = NewActivities(); err != nil {
+	if acc, err = NewEntries(); err != nil {
 		log.Fatal(err)
 	}
 	gsrv := grpc.NewServer()
 	srv := grpcServer{
-		Activities: acc,
+		Entries: acc,
 	}
-	api.RegisterActivity_LogServer(gsrv, &srv)
+	api.RegisterEntry(gsrv, &srv)
 	return gsrv
 }
 
-type Activity struct {
+type Entry struct {
 	Time        time.Time
 	Description string
 	ID          int

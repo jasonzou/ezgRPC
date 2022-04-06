@@ -1,0 +1,5 @@
+	go get github.com/mattn/go-sqlite3
+	go get google.golang.org/grpc
+	go get google.golang.org/grpc/codes
+	go get google.golang.org/grpc/reflection
+	go get google.golang.org/grpc/status

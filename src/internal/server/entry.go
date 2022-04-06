@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	api "github.com/jasonzou/ezproxygRPC/src/api/v1"
+	api "github.com/jasonzou/ezgRPC/src/api/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	// needed for SQLite driver
@@ -14,7 +14,7 @@ import (
 )
 
 const create string = `
-  CREATE TABLE IF NOT EXISTS activities (
+  CREATE TABLE IF NOT EXISTS entries (
   id INTEGER NOT NULL PRIMARY KEY,
   time DATETIME NOT NULL,
   description TEXT
@@ -38,8 +38,8 @@ func NewEntries() (*Entries, error) {
 		db: db,
 	}, nil
 }
-func (c *Entries) Insert(activity *api.Activity) (int, error) {
-	res, err := c.db.Exec("INSERT INTO activities VALUES(NULL,?,?);", activity.Time.AsTime(), activity.Description)
+func (c *Entries) Insert(entry *api.Entry) (int, error) {
+	res, err := c.db.Exec("INSERT INTO entries VALUES(NULL,?,?);", entry.Time.AsTime(), entry.Description)
 	if err != nil {
 		return 0, err
 	}
@@ -48,43 +48,43 @@ func (c *Entries) Insert(activity *api.Activity) (int, error) {
 	if id, err = res.LastInsertId(); err != nil {
 		return 0, err
 	}
-	log.Printf("Added %v as %d", activity, id)
+	log.Printf("Added %v as %d", entry, id)
 	return int(id), nil
 }
 
 var ErrIDNotFound = errors.New("Id not found")
 
-func (c *Entries) Retrieve(id int) (*api.Activity, error) {
+func (c *Entries) Retrieve(id int) (*api.Entry, error) {
 	log.Printf("Getting %d", id)
 
 	// Query DB row based on ID
-	row := c.db.QueryRow("SELECT id, time, description FROM activities WHERE id=?", id)
+	row := c.db.QueryRow("SELECT id, time, description FROM entries WHERE id=?", id)
 
 	// Parse row into Interval struct
-	activity := api.Activity{}
+	entry := api.Entry{}
 	var err error
 	var time time.Time
-	if err = row.Scan(&activity.Id, &time, &activity.Description); err == sql.ErrNoRows {
+	if err = row.Scan(&entry.Id, &time, &entry.Description); err == sql.ErrNoRows {
 		log.Printf("Id not found")
-		return &api.Activity{}, ErrIDNotFound
+		return &api.Entry{}, ErrIDNotFound
 	}
-	activity.Time = timestamppb.New(time)
-	return &activity, err
+	entry.Time = timestamppb.New(time)
+	return &entry, err
 }
 
-func (c *Entries) List(offset int) ([]*api.Activity, error) {
+func (c *Entries) List(offset int) ([]*api.Entry, error) {
 	log.Printf("Getting list from offset %d\n", offset)
 
 	// Query DB row based on ID
-	rows, err := c.db.Query("SELECT * FROM activities WHERE ID > ? ORDER BY id DESC LIMIT 100", offset)
+	rows, err := c.db.Query("SELECT * FROM entries WHERE ID > ? ORDER BY id DESC LIMIT 100", offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	data := []*api.Activity{}
+	data := []*api.Entry{}
 	for rows.Next() {
-		i := api.Activity{}
+		i := api.Entry{}
 		var time time.Time
 		err = rows.Scan(&i.Id, &time, &i.Description)
 		if err != nil {

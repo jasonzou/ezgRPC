@@ -4,7 +4,7 @@
 // - protoc             v3.20.0
 // source: src/api/v1/entry.proto
 
-package ezproxygRPC
+package ezgRPC
 
 import (
 	context "context"

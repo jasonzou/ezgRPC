@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/jasonzou/ezproxygRPC/src/internal/server"
+	"github.com/jasonzou/ezgRPC/src/internal/server"
 	"google.golang.org/grpc/reflection"
 )
 

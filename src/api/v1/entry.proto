@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.v1;
 
-option go_package = "./ezproxygRPC";
+option go_package = "./ezgRPC";
 
 import "google/protobuf/timestamp.proto";
 
