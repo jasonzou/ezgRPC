@@ -15,7 +15,7 @@ import (
 // var _ api1.Entry = (*grpcServer)(nil)
 
 type grpcServer struct {
-	api.UnimplementedEntry
+	api.UnimplementedEntryServicesServer
 	Entries *Entries
 }
 
@@ -58,7 +58,7 @@ func NewGRPCServer() *grpc.Server {
 	srv := grpcServer{
 		Entries: acc,
 	}
-	api.RegisterEntry(gsrv, &srv)
+	api.RegisterEntryServicesServer(gsrv, &srv)
 	return gsrv
 }
 

@@ -17,7 +17,7 @@ message Entry{
     string operator = 8;
 }
 
-service Entry_Action{
+service EntryServices{
     rpc Insert(Entry) returns (InsertResponse) {}
     rpc Modify(Entry) returns (ModifyResponse) {}
     rpc Retrieve(RetrieveRequest) returns (Entry) {}

@@ -17,7 +17,11 @@ const create string = `
   CREATE TABLE IF NOT EXISTS entries (
   id INTEGER NOT NULL PRIMARY KEY,
   time DATETIME NOT NULL,
-  description TEXT
+	prefix TEXT,
+  suffix TEXT,
+  title TEXT NOT NULL,
+  url TEXT NOT NULL,
+  config TEXT NOT NULL,
     );
     `
 const file string = "entries.db"
@@ -39,7 +43,8 @@ func NewEntries() (*Entries, error) {
 	}, nil
 }
 func (c *Entries) Insert(entry *api.Entry) (int, error) {
-	res, err := c.db.Exec("INSERT INTO entries VALUES(NULL,?,?);", entry.Time.AsTime(), entry.Description)
+	res, err := c.db.Exec("INSERT INTO entries VALUES(NULL,?,?,?,?,?,?);",
+		entry.Time.AsTime(), entry.Prefix, entry.Suffix, entry.Title, entry.Url, entry.Config)
 	if err != nil {
 		return 0, err
 	}
@@ -58,13 +63,13 @@ func (c *Entries) Retrieve(id int) (*api.Entry, error) {
 	log.Printf("Getting %d", id)
 
 	// Query DB row based on ID
-	row := c.db.QueryRow("SELECT id, time, description FROM entries WHERE id=?", id)
+	row := c.db.QueryRow("SELECT id, time, prefix, suffix, title, url, config FROM entries WHERE id=?", id)
 
 	// Parse row into Interval struct
 	entry := api.Entry{}
 	var err error
 	var time time.Time
-	if err = row.Scan(&entry.Id, &time, &entry.Description); err == sql.ErrNoRows {
+	if err = row.Scan(&entry.Id, &time, &entry.Prefix, &entry.Suffix, &entry.Title, &entry.Url, &entry.Config); err == sql.ErrNoRows {
 		log.Printf("Id not found")
 		return &api.Entry{}, ErrIDNotFound
 	}
@@ -86,7 +91,7 @@ func (c *Entries) List(offset int) ([]*api.Entry, error) {
 	for rows.Next() {
 		i := api.Entry{}
 		var time time.Time
-		err = rows.Scan(&i.Id, &time, &i.Description)
+		err = rows.Scan(&i.Id, &time, &i.Prefix, &i.Suffix, &i.Title, &i.Url, &i.Config)
 		if err != nil {
 			return nil, err
 		}
