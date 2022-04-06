@@ -63,7 +63,11 @@ func NewGRPCServer() *grpc.Server {
 }
 
 type Entry struct {
-	Time        time.Time
-	Description string
-	ID          int
+	Time   time.Time
+	ID     int
+	Prefix string
+	Suffix string
+	Title  string
+	Url    string
+	Config string
 }
