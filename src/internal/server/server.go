@@ -51,13 +51,16 @@ func (s *grpcServer) List(ctx context.Context, req *api.ListRequest) (*api.Entri
 func NewGRPCServer() *grpc.Server {
 	var acc *Entries
 	var err error
+	log.Print("starting grpc")
 	if acc, err = NewEntries(); err != nil {
 		log.Fatal(err)
 	}
+	log.Print("starting grpc 11")
 	gsrv := grpc.NewServer()
 	srv := grpcServer{
 		Entries: acc,
 	}
+	log.Print("starting grpc 11")
 	api.RegisterEntryServicesServer(gsrv, &srv)
 	return gsrv
 }

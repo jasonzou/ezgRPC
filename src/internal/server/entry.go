@@ -21,8 +21,7 @@ const create string = `
   suffix TEXT,
   title TEXT NOT NULL,
   url TEXT NOT NULL,
-  config TEXT NOT NULL,
-    );
+  config TEXT NOT NULL);
     `
 const file string = "entries.db"
 
@@ -31,13 +30,16 @@ type Entries struct {
 }
 
 func NewEntries() (*Entries, error) {
+	log.Print("new entries")
 	db, err := sql.Open("sqlite3", file)
 	if err != nil {
 		return nil, err
 	}
+	log.Print("new entries 22")
 	if _, err := db.Exec(create); err != nil {
 		return nil, err
 	}
+	log.Print("new entries 223332")
 	return &Entries{
 		db: db,
 	}, nil
